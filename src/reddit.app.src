@@ -1,0 +1,4 @@
+{application,reddit,[{description,"Reddit Part I engine and simulator"},{vsn,"1.0.0"},
+ {registered,[reddit_sup,reddit_server]},{mod,{reddit_app,[]}},
+ {applications,[kernel,stdlib]},{env,[]},
+ {modules,[reddit_app,reddit_sup,reddit_server,reddit_engine,reddit_sim,reddit_metrics,reddit_bench,reddit_report]}]}.

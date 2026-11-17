@@ -1,0 +1,356 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 7 /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1572 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(PROJECT 4, PART I: REDDIT CLONE) Tj T*
+(Pure Erlang/OTP Engine and Client Simulator) Tj T*
+() Tj T*
+(TEAM MEMBERS) Tj T*
+() Tj T*
+(Harsha Karimikonda | UFID 50966091) Tj T*
+(Email: hkarimkonda@ufl.edu) Tj T*
+() Tj T*
+(Venkatesh Gollepalli | UFID 24690032) Tj T*
+(Email: ve.gollepalli@ufl.edu) Tj T*
+() Tj T*
+(SUMMARY) Tj T*
+() Tj T*
+(A single authoritative OTP gen_server implements account registration,) Tj T*
+(subreddit membership, text posts and reposts, hierarchical comments,) Tj T*
+(upvotes/downvotes and karma, feeds, and direct messages with replies.) Tj T*
+(Two independent client BEAM OS processes simulate concurrent users.) Tj T*
+(All application, testing, benchmarking, PDF and ZIP tooling uses Erlang/OTP.) Tj T*
+() Tj T*
+(Largest population tested: 50000 simulated users) Tj T*
+(Largest population meeting the configured SLO: 20000 users) Tj T*
+(Completed benchmark runs: 11) Tj T*
+(Sweep elapsed: 562 s; configured budget: 900 s) Tj T*
+(Stop reason:) Tj T*
+(Completion, timeout, latency or sustained mailbox-growth criterion failed.) Tj T*
+() Tj T*
+(Final probe: 50000 users, p95 upper bound 4096 ms; SLO passed: false) Tj T*
+(The final probe missed the configured SLO; consult latency and outcome rows.) Tj T*
+() Tj T*
+(The largest tested population is not a claim about an absolute system limit.) Tj T*
+(All numbers in this report are derived from the supplied JSON evidence.) Tj T*
+(The report PDF is deliberately excluded from project4.zip.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (1 / 7) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 2576 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(ARCHITECTURE AND FEATURE SEMANTICS) Tj T*
+() Tj T*
+(Process layout:) Tj T*
+(  Erlang escript controller \(OTP peer lifecycle and measurements\)) Tj T*
+(    -> Engine OS process: application -> supervisor -> reddit_server) Tj T*
+(    -> Client OS process 0: coordinator -> one process per assigned user) Tj T*
+(    -> Client OS process 1: coordinator -> one process per assigned user) Tj T*
+() Tj T*
+(Engine calls cross node boundaries using distributed Erlang gen_server calls.) Tj T*
+(Each client node owns its metrics collector. One-second resource samplers run) Tj T*
+(on the engine and both client nodes. The controller stops peers in cleanup.) Tj T*
+() Tj T*
+(reddit_engine contains pure state transitions. The gen_server serializes) Tj T*
+(updates atomically; maps index accounts, communities, content, memberships,) Tj T*
+(votes, comments, child comments, inboxes and per-community post IDs.) Tj T*
+() Tj T*
+(Creating a community joins its creator. Joining/leaving is idempotent.) Tj T*
+(Posting and commenting require membership. Posts contain plain text only.) Tj T*
+(Comments reference a post plus an optional parent comment; a parent from) Tj T*
+(another post is rejected. Arbitrary depth is represented without recursion) Tj T*
+(in storage, and thread reads expose parent IDs for reconstruction.) Tj T*
+() Tj T*
+(Each user has one vote per post/comment, with values -1, 0, +1. Replacing or) Tj T*
+(removing a vote applies its delta to content score and the author's karma.) Tj T*
+(Self-voting is rejected; new content starts at zero score.) Tj T*
+() Tj T*
+(Feeds merge posts from joined communities, newest ID first, with exclusive) Tj T*
+(ID cursors and limits of 1-100. Content IDs provide stable ordering.) Tj T*
+(Reposts retain the source post ID while receiving their own IDs and votes.) Tj T*
+() Tj T*
+(Inboxes expose only messages addressed to the caller. Only recipients can) Tj T*
+(reply; replies reference the previous message. Offline recipients retain) Tj T*
+(messages, memberships and content, and recover access on reconnect.) Tj T*
+() Tj T*
+(Responses are {ok,Value} or {error,Reason}; reasons include duplicate,) Tj T*
+(invalid, not_found, forbidden, offline, timeout and unavailable. OTP call) Tj T*
+(references correlate requests. Mutation timeouts are never auto-retried.) Tj T*
+() Tj T*
+(The supervisor restarts a crashed engine with empty state. The benchmark) Tj T*
+(checks the engine PID and rejects a run if the server restarted.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (2 / 7) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 2770 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(SIMULATOR AND MEASUREMENT METHOD) Tj T*
+() Tj T*
+(Users are partitioned by user ID modulo the number of client nodes.) Tj T*
+(Every user is a real Erlang process with seeded PRNG state. Setup registers) Tj T*
+(users, joins communities, and seeds posts, comments and direct-message threads.) Tj T*
+() Tj T*
+(The target member count at subreddit rank r is max\(1, floor\(N/r^1.1\)\).) Tj T*
+(A rank-specific cyclic permutation selects exactly that many distinct users.) Tj T*
+(Each subreddit also contains one seed account. Rank 1 contains every user.) Tj T*
+(The benchmark checks all 100 observed membership counts against the targets.) Tj T*
+() Tj T*
+(Online users wait a random initial phase, choose an action, await its reply,) Tj T*
+(and sleep 1000 ms. Default action probabilities are 30% feed, 25% post,) Tj T*
+(20% comment, 15% vote, 5% messaging and 5% membership changes. A membership) Tj T*
+(action issues leave plus join. Lifecycle requests are measured separately.) Tj T*
+(10% of posting actions are reposts. Half of comment actions target a prior) Tj T*
+(comment; cached per-community parents allow comment depth to grow.) Tj T*
+() Tj T*
+(Users stay online for 5-15 seconds, then offline for 2-5 seconds. Offline) Tj T*
+(users issue no activity requests. These are application-level disconnections:) Tj T*
+(client worker nodes remain alive to simulate many independent users.) Tj T*
+(Choosing among joined subreddits makes popular communities receive more) Tj T*
+(posting traffic. The results include member/post-count correlation.) Tj T*
+() Tj T*
+(Each run starts with a fresh engine. Setup is excluded, followed by 10 seconds) Tj T*
+(of warmup and 30 seconds of measurement. Seeds 42/43/44 are used for three) Tj T*
+(repetitions at 100, 1000 and 10000 users. Larger probes use seed 42.) Tj T*
+() Tj T*
+(Offered requests are counted by start time; completions by response time.) Tj T*
+(Window-boundary in-flight calls may make the totals differ. Latencies use) Tj T*
+(bounded power-of-two millisecond histograms; reported percentiles are upper) Tj T*
+(bounds, not exact samples. A 1 ms bucket includes sub-millisecond replies.) Tj T*
+() Tj T*
+(The success criterion is >=99% successful observed completions, <1% timeouts,) Tj T*
+(p95 <1000 ms, and no sustained mailbox growth. Growth means six consecutive) Tj T*
+(increasing samples ending above 100 queued requests. It is a heuristic.) Tj T*
+(Larger probes stop after a failed run/criterion or the sweep time budget.) Tj T*
+() Tj T*
+(This is a closed-loop simulation: latency and offline periods reduce offered) Tj T*
+(load. User population is reported separately from active request throughput.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (3 / 7) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 1766 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(MEASURED PERFORMANCE) Tj T*
+() Tj T*
+(All throughput values are requests/second; percentile values are ms upper bounds.) Tj T*
+() Tj T*
+( Users  Seed   Offered/s   Success/s  p50   p95   p99  Errors Timeouts) Tj T*
+() Tj T*
+(   100    42        93.0        93.0  1  1  1       0        0) Tj T*
+(   100    43        93.5        93.5  1  1  1       0        0) Tj T*
+(   100    44        89.9        89.9  1  2  4       0        0) Tj T*
+(  1000    42       940.1       940.1  1  2  4       0        0) Tj T*
+(  1000    43       925.6       925.6  1  1  2       0        0) Tj T*
+(  1000    44       905.9       905.9  1  4  8       0        0) Tj T*
+( 10000    42      9239.8      9248.5  1  16  32       0        0) Tj T*
+( 10000    43      9224.3      9224.3  1  4  16       0        0) Tj T*
+( 10000    44      9062.6      9062.6  1  64  64       0        0) Tj T*
+( 20000    42     18542.2     18526.4  4  64  128       0        0) Tj T*
+( 50000    42     22952.6     23113.1  1024  4096  4096       0        0) Tj T*
+() Tj T*
+(THROUGHPUT VARIABILITY) Tj T*
+() Tj T*
+(   100 users: n=3, min/median/max 89.9 / 93.0 / 93.5 req/s) Tj T*
+(  1000 users: n=3, min/median/max 905.9 / 925.6 / 940.1 req/s) Tj T*
+( 10000 users: n=3, min/median/max 9062.6 / 9224.3 / 9248.5 req/s) Tj T*
+( 20000 users: n=1, min/median/max 18526.4 / 18526.4 / 18526.4 req/s) Tj T*
+( 50000 users: n=1, min/median/max 23113.1 / 23113.1 / 23113.1 req/s) Tj T*
+() Tj T*
+(Largest tested: 50000; largest SLO-passing: 20000) Tj T*
+(An SLO-passing point is not proof of unlimited scalability or a maximum.) Tj T*
+(Raw histograms, snapshots and one-second resource samples are in the ZIP.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (4 / 7) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 1524 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(RESOURCES AND WORKLOAD CHECKS) Tj T*
+() Tj T*
+(Representative population: 50000 users; seed 42) Tj T*
+() Tj T*
+(Node        Peak MiB     CPU ms   CPU %*    Peak queue) Tj T*
+() Tj T*
+(engine          207.9      19719       67.9      42248) Tj T*
+(worker0        2445.0       4315       14.8          0) Tj T*
+(worker1        2687.7       4401       15.0          0) Tj T*
+() Tj T*
+(* CPU % is runtime CPU divided by elapsed sample time, relative to one core.) Tj T*
+(It may exceed 100% when multiple schedulers are active. Peers use two each.) Tj T*
+(Peak queue is the engine request mailbox; client entries have no engine.) Tj T*
+() Tj T*
+(Offered requests in measurement: 688578) Tj T*
+(Observed completions: 693392) Tj T*
+(Successful completion fraction: 1.0000) Tj T*
+(Timeout fraction: 0.0000) Tj T*
+(Exact Zipf membership targets verified: true) Tj T*
+(Membership versus new-post Pearson correlation: 0.9967265833329464) Tj T*
+(New reposts \(warmup + measurement\): 14922) Tj T*
+(Final online accounts, including seed: 50001) Tj T*
+(Sustained mailbox growth detected: false) Tj T*
+() Tj T*
+(Member-count checks use the initial snapshot. Posting correlation and repost) Tj T*
+(counts compare initial/final snapshots and therefore include warmup. Request) Tj T*
+(throughput and latency statistics exclude setup and warmup.) Tj T*
+() Tj T*
+(All raw counts are retained to make the performance claims auditable.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (5 / 7) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 1699 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(PER-OPERATION MEASUREMENTS) Tj T*
+() Tj T*
+(Population 50000, seed 42, 30-second measurement window) Tj T*
+() Tj T*
+(Operation          Offered  Success Errors Timeout  p50  p95  p99) Tj T*
+() Tj T*
+(comment              41200    41703      0       0 1024 4096 4096) Tj T*
+(disconnect           94656   100117      0       0 1024 4096 4096) Tj T*
+(feed                143869   144202      0       0 1024 4096 4096) Tj T*
+(inbox                 9211     9374      0       0 2048 4096 4096) Tj T*
+(join                 23849    22403      0       0 2048 4096 4096) Tj T*
+(leave                24939    23849      0       0 1024 4096 4096) Tj T*
+(nested_comment       43660    44406      0       0 2048 4096 4096) Tj T*
+(post                107381   108068      0       0 1024 4096 4096) Tj T*
+(reconnect            99801    98490      0       0 1024 2048 4096) Tj T*
+(reply_message         8167     8318      0       0 1024 4096 4096) Tj T*
+(repost               11760    10961      0       0 2048 4096 4096) Tj T*
+(send_message          8582     8602      0       0 2048 4096 4096) Tj T*
+(vote                 71503    72899      0       0 1024 4096 4096) Tj T*
+() Tj T*
+(Lifecycle requests \(disconnect/reconnect\) and leave/join pairs are included) Tj T*
+(in total request throughput. Consequently request percentages differ from) Tj T*
+(the configured action-choice probabilities. Message seeds occur in setup.) Tj T*
+() Tj T*
+(Exact operation histograms and outcomes are provided for every run, not just) Tj T*
+(this representative run. Latency distributions include failures/timeouts.) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (6 / 7) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 17 0 R >>
+endobj
+17 0 obj
+<< /Length 2533 >>
+stream
+1 1 1 rg 0 0 612 792 re f 0 0 0 rg
+BT /F1 9 Tf 42 754 Td 13 TL
+(VALIDATION, LIMITATIONS AND REPRODUCTION) Tj T*
+() Tj T*
+(Validation:) Tj T*
+(13 EUnit tests cover registration, membership, arbitrary nested comments,) Tj T*
+(cross-post parent rejection, vote replacement/removal and karma, multi-feed) Tj T*
+(pagination, reposts, inbox privacy, offline delivery, invalid operations,) Tj T*
+(exact Zipf member counts and histogram percentiles. A distributed demo tests) Tj T*
+(the features across two OS processes, 50 concurrent identical votes,) Tj T*
+(offline/reconnect, an unresponsive request and an unavailable engine node.) Tj T*
+() Tj T*
+(Runtime for the representative run:) Tj T*
+(OTP 29; architecture aarch64-apple-darwin; available logical CPUs 8) Tj T*
+(Schedulers per engine/client node: 2) Tj T*
+() Tj T*
+(Install Erlang/OTP 27+ \(OTP 29.1.2 was used here\). No Hex, Rebar, Gleam,) Tj T*
+(Python, database, web server or external PDF library is required.) Tj T*
+(Run from the extracted project directory:) Tj T*
+(  escript scripts/project4.escript test) Tj T*
+(  escript scripts/project4.escript demo) Tj T*
+(  escript scripts/project4.escript simulate --users 1000) Tj T*
+(  escript scripts/project4.escript benchmark --output results/new-sweep) Tj T*
+(  escript scripts/project4.escript report --input results/new-sweep) Tj T*
+(  escript scripts/project4.escript package) Tj T*
+(Output directories must be new; existing evidence is not overwritten.) Tj T*
+() Tj T*
+(Limitations: all engine data is in memory. Restart resets it. A single state) Tj T*
+(server serializes engine operations and limits throughput. These are local) Tj T*
+(loopback measurements with fixed text payloads, brief windows and no disk) Tj T*
+(durability, authentication, HTTP/WebSocket traffic or browser clients.) Tj T*
+(Memory is sampled BEAM allocated memory, not OS resident-set size. CPU is) Tj T*
+(BEAM runtime CPU time between the first and last measurement-window samples.) Tj T*
+(Sampling can miss short peaks; scheduler counts are capped to avoid laptop) Tj T*
+(oversubscription. Seeds reproduce workload choices, not interleaving/timing.) Tj T*
+() Tj T*
+(Evidence directory:) Tj T*
+(/Users/hkarimkonda/Documents/dosp_project_4.1/results/erlang-benchmark) Tj T*
+() Tj T*
+(References: assignment specification; Reddit API reference:) Tj T*
+(https://www.reddit.com/dev/api/) Tj T*
+(Erlang/OTP documentation: gen_server, supervisor, peer, EUnit, json, zip.) Tj T*
+(https://www.erlang.org/doc/) Tj T*
+ET
+BT /F1 9 Tf 270 30 Td (7 / 7) Tj ET
+endstream
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000155 00000 n 
+0000000250 00000 n 
+0000000376 00000 n 
+0000001999 00000 n 
+0000002125 00000 n 
+0000004752 00000 n 
+0000004878 00000 n 
+0000007699 00000 n 
+0000007827 00000 n 
+0000009645 00000 n 
+0000009773 00000 n 
+0000011349 00000 n 
+0000011477 00000 n 
+0000013228 00000 n 
+0000013356 00000 n 
+trailer
+<< /Size 18 /Root 1 0 R >>
+startxref
+15941
+%%EOF

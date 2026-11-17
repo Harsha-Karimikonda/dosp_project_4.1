@@ -1,0 +1,17 @@
+Project 4, Part I - Reddit Clone Engine and Simulator
+
+Team Members:
+1. Harsha Karimikonda
+   Email: hkarimkonda@ufl.edu
+   UFID: 50966091
+2. Venkatesh Gollepalli
+   Email: ve.gollepalli@ufl.edu
+   UFID: 24690032
+
+Attachments:
+- project4.zip: pure Erlang/OTP source, tests, simulator, benchmark tools,
+  measured benchmark evidence, and README with run instructions.
+- report.pdf: project report with architecture, methodology, measured
+  performance numbers, limitations, and run instructions.
+
+The report PDF is submitted separately and is not inside project4.zip.
